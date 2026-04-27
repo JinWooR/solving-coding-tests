@@ -1,0 +1,34 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/389479
+
+class Solution {
+    int current_expand_server = 0; // 현재 증설 서버 수
+    int[] release_ser = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}; // 증설 해제 서버
+    
+    public int solution(int[] players, int m, int k) {
+        int answer = 0;
+        
+        for (int i = 0; i < players.length; i++) {
+            current_expand_server -= release_ser[i]; // 증설 서버 해제
+            
+            int cur_need_exp_ser = calNeedSer(players[i], m, current_expand_server); // 현재 증설 서버 - 필요 추가 서버 (n)
+            if (cur_need_exp_ser > 0) { // 서버 증설 필요
+                setReleaseServer(i+k, cur_need_exp_ser); // 증설 서버 해제 예약 시간 저장
+                
+                current_expand_server += cur_need_exp_ser; // 현재 증설 서버 수 최신화
+                answer += cur_need_exp_ser; // 증설 횟수 추가
+            }
+        }
+        
+        return answer;
+    }
+    
+    public int calNeedSer(int plyrs, int m, int cur_exp_ser) {
+        return plyrs/m - cur_exp_ser;
+    }
+    
+    public void setReleaseServer(int limitHour, int exp_ser) {
+        if (limitHour <= 23) {
+            release_ser[limitHour] = exp_ser;
+        }
+    }
+}
