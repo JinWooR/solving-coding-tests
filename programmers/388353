@@ -1,0 +1,136 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/388353
+
+import java.io.*;
+import java.util.*;
+
+class Solution {
+    final int[] mx = new int[]{1,-1,0,0}, my = new int[]{0,0,1,-1};
+    char padding[][]; // 상하좌우 패딩 적용
+    int padRow, padCol; // 패딩 적용 row, col
+    
+    public int solution(String[] storage, String[] requests) {
+        padRow = storage.length + 2;
+        padCol = storage[0].length() + 2;
+        
+        setPadding(storage);
+        
+        for (int i = 0; i < requests.length; i++) {
+            delivery(requests[i]);
+        }
+        
+        // 컨테이너 개수 계산
+        int answer = 0;
+        for (int i = this.padding.length-1; i >= 0; i--) {
+            for (int j = this.padding[0].length-1; j >= 0; j--) {
+                if (this.padding[i][j] != ' ') answer++;
+            }
+        }
+        return answer;
+    }
+    
+    // 컨테이너 출고 요청 수행
+    public void delivery(String request) {
+        char container = request.charAt(0);
+        boolean isCrane = request.length() == 2;
+        
+        // 출고 요청에 해당하는 컨테이너 좌표 정리
+        List<int[]> containers = checkContainer(container);
+        
+        // 접근 가능한 영역 조회 (크레인 사용시 대비 null 기본 초기화)
+        boolean[][] isAccessRoad = null;
+        if (!isCrane) {
+            isAccessRoad = bfs();
+        }
+        
+        // 실제로 출고 가능한 컨테이너 체크
+        for(int[] c : containers) {
+            if (isCrane || check(c[0], c[1], isAccessRoad)) {
+                padding[c[0]][c[1]] = '-'; // 출고 예정 표시
+            }
+        }
+        
+        // 컨테이너 출고 처리
+        for (int[] c : containers) {
+            if (padding[c[0]][c[1]] == '-') { // 출고 예정 컨테이너 출고 진행
+                padding[c[0]][c[1]] = ' ';
+            }
+        }
+    }
+    
+    // 출고 요청에 해당하는 컨테이너 좌표 목록 조회 (가능 여부 X / 컨테이너만 조회)
+    public List<int[]> checkContainer(char container) {
+        List<int[]> containers = new ArrayList();
+        for (int i = padding.length-1; i >= 0; i--) {
+            for (int j = padding[0].length-1; j >= 0; j--) {
+                if (padding[i][j] == container) {
+                    containers.add(new int[]{i, j});
+                }
+            }
+        }
+        
+        return containers;
+    }
+    
+    // 컨테이너 패딩 추가 및 이차원 배열 정리
+    public void setPadding(String[] storage) {
+        this.padding = new char[padRow][padCol];
+        
+        for (int i = 0; i < padRow; i++) {
+            Arrays.fill(this.padding[i], ' ');
+        }
+        
+        for (int i = 0; i < padRow-2; i++) {
+            for (int j = 0; j < padCol-2; j++) {
+                this.padding[i+1][j+1] = storage[i].charAt(j);
+            }
+        }
+    }
+    
+    // 지게차로 컨테이너 출고 가능한지 검증 (x1, y1 컨테이너 좌표)
+    public boolean check(int row, int col, boolean[][] isAccessRoad) {
+        // 상하 좌우 조절
+        for (int i = 0; i < 4; i++) {
+            int nextRow = row + my[i];
+            int nextCol = col + mx[i];
+
+            if (isAccessRoad[nextRow][nextCol]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // 접근 가능 경로 정리
+    public boolean[][] bfs() {
+        boolean[][] isAccessRoad = new boolean[padRow][padCol];
+        boolean[][] visited = new boolean[padRow][padCol];
+        
+        Queue<int[]> q = new LinkedList();
+        q.add(new int[]{0,0});
+        isAccessRoad[0][0] = true;
+        visited[0][0] = true;
+        
+        while(!q.isEmpty()) {
+            int[] poll = q.poll();
+            int row = poll[0], col = poll[1];
+            
+            // 상하 좌우 조절
+            for (int i = 0; i < 4; i++) {
+                int nextRow = row + my[i];
+                int nextCol = col + mx[i];
+                
+                if (nextRow < 0 || nextRow >= padRow || nextCol < 0 || nextCol >= padCol) {
+                    continue;
+                }
+                
+                if (!visited[nextRow][nextCol] && this.padding[nextRow][nextCol] == ' ') {
+                    q.add(new int[]{nextRow, nextCol});
+                    isAccessRoad[nextRow][nextCol] = true;
+                    visited[nextRow][nextCol] = true;
+                }
+            }
+        }
+        
+        return isAccessRoad;
+    }
+}
