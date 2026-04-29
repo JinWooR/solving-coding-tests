@@ -1,0 +1,41 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/389480
+
+import java.io.*;
+import java.util.*;
+
+class Solution {
+    boolean[] isThievery;
+    public int solution(int[][] info, int n, int m) {
+        // 보물 우선 순위 정렬
+        Arrays.sort(info, (o1, o2) -> (o2[0] - o2[1]) - (o1[0] - o1[1]));
+        // 각 보물별 훔친 여부 초기화
+        isThievery = new boolean[info.length];
+        
+        // B, A 도둑 순서대로 보물 훔치기
+        int bLouis = thievery(info, 1, m);
+        int aLouis = thievery(info, 0, n);
+
+        return isAllThievery() ? aLouis : -1;
+    }
+    
+    public int thievery(int[][] sortedInfo, int idx, int limit) {
+        int louis = 0;
+        // 흔적 계산
+        for (int i = 0; i < sortedInfo.length; i++) {
+            if (isThievery[i]) continue;
+            
+            int tl = sortedInfo[i][idx]; // 흔적
+            
+            if (limit > louis + tl) { // 훔치다
+                louis += tl;
+                isThievery[i] = true;
+            }
+        }
+        return louis;
+    }
+
+    public boolean isAllThievery() {
+        for (boolean thievery : isThievery) if (!thievery) return false;
+        return true;
+    }
+}
