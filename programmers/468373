@@ -1,0 +1,99 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/468373
+
+/*
+
+아쉬운점)
+  이차원 배열 Set<Intger>[][] 를 통해 해당 노드의 파이프별 연결 노드를 정리하여 실제 가독성 저하 발생.
+개선방향)
+  별도의 Edge (int to, int pipe) 클래스를 생성 후.
+  List<Edge>[] 선언을 한다면, 각 노드별 연관된 노드 및 연결 파이프까지 포함되어있어 가독성이 좋아짐.
+
+아쉬운점)
+  DFS - infect() 과한 메소드 책임 : 파이프 진행 여부 / 감염 확산 로직이 하나에 모여있어 책임 분리 부족.
+
+*/
+
+import java.util.*;
+import java.io.*;
+
+class Solution {
+    Set<Integer>[][] aDg; // aDg[A,B,C 파이프: 0~2][배양체 번호: 1~n]
+    boolean[] isInfection; // 감염체 정보
+    
+    // n 배양체 개수, infection 감염된 배양체, edges 배양체간 파이프 정보, k 파이프 횟수
+    public int solution(int n, int infection, int[][] edges, int k) {
+        // aDg 초기화
+        aDg(n);
+        
+        // edge 정렬
+        sortedEdges(edges);
+        
+        // 감염 노드 기본 세팅
+        isInfection = new boolean[n+1];
+        isInfection[infection] = true;
+        
+        // 배양체 감염 시작
+        int answer = 0;
+        for (int pipe = 0; pipe < 3; pipe++) {
+            answer = Math.max(answer, infect(pipe, k, isInfection));
+        }
+        
+        return answer;
+    }
+    
+    // pipe: 오픈할 파이프
+    public int infect(int pipe, int limit, boolean[] isInfection) {
+        boolean[] currentInfection = isInfection.clone(); // 감염체 정보 복사
+        
+        Queue<Integer> s = new LinkedList();
+        for (int i = isInfection.length-1; i > 0; i--) {
+            if (currentInfection[i]) {
+                s.offer(i);
+            }
+            
+            while(!s.isEmpty()) {
+                for (int n : aDg[pipe][s.poll()]) {
+                    if (!currentInfection[n]) {
+                        currentInfection[n] = true;
+                        s.offer(n);
+                    }
+                }
+            }
+        }
+        
+        int result = 0; // 감염된 배양체 개수
+        limit--;
+        if (limit == 0) { // 시행 완료 결과 반환
+            for (int i = currentInfection.length-1; i > 0; i--) {
+                if (currentInfection[i]) {
+                    result++;
+                }
+            }
+        } else { // 다음 파이프 작업 진행
+            for (int i = 0; i < 3; i++) {
+                if (pipe != i) {
+                    result = Math.max(result, infect(i, limit, currentInfection));
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    public void sortedEdges(int[][] edges) {
+        for (int i = edges.length-1; i >= 0; i--) {
+            int[] edge = edges[i];
+            aDg[edge[2]-1][edge[0]].add(edge[1]);
+            aDg[edge[2]-1][edge[1]].add(edge[0]);
+        }
+    }
+    
+    public void aDg(int maxNode) {
+        aDg = new HashSet[3][maxNode+1];
+        for (int i = maxNode; i > 0; i--) {
+            aDg[0][i] = new HashSet();
+            aDg[1][i] = new HashSet();
+            aDg[2][i] = new HashSet();
+        }
+    }
+}
