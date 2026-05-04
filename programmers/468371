@@ -1,0 +1,61 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/468371
+
+/*
+  각 신호등 (초록>노랑>빨강) 변화 주기 시간 계산. (cycle)
+  최소 공배수를 계산하여 최대 제한 시간 설정. (timeLimit)
+
+  매 1초마다 모든 신호등 불빛이 노랑 구간에 포함되어있는지 확인.
+*/
+
+import java.util.*;
+
+class Solution {
+    public int solution(int[][] signals) {
+        int len = signals.length;
+        
+        int[] cycle = new int[len]; // 신호등 (초록>노랑>빨강) 변화 주기 시간
+        for (int i = len - 1; i >= 0; i--) {
+            cycle[i] = Arrays.stream(signals[i]).sum();
+        }
+        
+        // 모든 신호등 주기 최소공배수
+        int timeLimit = cycle[0];
+        for (int i = cycle.length - 1; i > 0; i--) {
+            timeLimit = getLCM(timeLimit, cycle[i]);
+        }
+        
+        // 검사
+        boolean isAllYellow = false;
+        int time = 0;
+        while(time <= timeLimit && !isAllYellow) {
+            isAllYellow = true;
+            time++;
+            
+            for (int i = 0; i < len; i++) {
+                int[] signal = signals[i];
+                int sigTime = time % cycle[i];
+                
+                if (signal[0] >= sigTime || sigTime > (signal[0] + signal[1])) {
+                    isAllYellow = false;
+                }
+            }
+        }
+        return isAllYellow ? time : -1;
+    }
+    
+    // 최대 공약수
+    public int getGCD(int a, int b) {
+        while(b != 0) {
+            int tmp = a % b;
+            a = b;
+            b = tmp;
+        }
+        
+        return a;
+    }
+    
+    // 최소 공배수
+    public int getLCM(int a, int b) {
+        return (a * b) / getGCD(a, b);
+    }
+}
