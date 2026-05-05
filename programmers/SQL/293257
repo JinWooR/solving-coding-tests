@@ -1,0 +1,28 @@
+/* https://school.programmers.co.kr/learn/courses/30/lessons/293257 */
+
+select
+    count(A.FISH_TYPE) as FISH_COUNT,
+    A.FISH_NAME
+from FISH_NAME_INFO A
+join FISH_INFO B
+on A.FISH_TYPE = B.FISH_TYPE
+group by A.FISH_TYPE
+order by FISH_COUNT DESC;
+
+/*
+  아래 쿼리는 물고기 집계를 우선하여 레코드를 줄인 뒤 조인을 진행하여 쿼리 성능을 높이려했으나 실제 테스트 데이터 이상이 있는지 실패 발생
+
+  select
+      A.FISH_COUNT,
+      B.FISH_NAME
+  from (
+      select
+          FISH_TYPE,
+          count(FISH_TYPE) as FISH_COUNT
+      from FISH_INFO
+      group by FISH_TYPE
+      ) A
+  join FISH_NAME_INFO B
+  on A.FISH_TYPE = B.FISH_TYPE
+  order by A.FISH_COUNT desc;
+*/
