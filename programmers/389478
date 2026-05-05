@@ -1,0 +1,15 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/389478
+
+class Solution {
+    public int solution(int n, int w, int num) {
+        int answer = 0;
+        int nextBox = num; // 다음 상자 번호
+        while(n >= nextBox) {
+            int mod = nextBox % w;
+            nextBox = w * (nextBox / w + (mod > 0 ? 2 : 0)) - mod + 1;
+            answer++;
+        }
+        
+        return answer;
+    }
+}
