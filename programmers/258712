@@ -1,0 +1,57 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/258712
+
+/*
+  jisu[선물을 준 사람] 각자의 선물 지수
+  giveAndTake[선물을 준 사람][선물을 받은 사람] ==>> 어느 친구에게 몇개의 선물을 제공했는지 정리
+  nextGift[선물을 받을 사람] 다음달에는 총 몇개의 선물을 제공받는지 정리
+*/
+
+import java.util.*;
+
+class Solution {
+    public int solution(String[] friends, String[] gifts) {
+        int fLen = friends.length,
+            gLen = gifts.length;
+        
+        int[] jisu = new int[fLen];
+        int[][] giveAndTake = new int[fLen][fLen];
+        int[] nextGift = new int[fLen];
+        Map<String, Integer> map = new HashMap();
+        
+        // 1. map 세팅
+        for (int i = 0; i < fLen; i++) {
+            map.put(friends[i], i);
+        }
+        
+        // 2. 주고 받은 선물 (giveAndTake) 및 지수 (jisu) 계산
+        for (int i = 0; i < gLen; i++) {
+            String[] gift = gifts[i].split(" ");
+            int give = map.get(gift[0]),
+                take = map.get(gift[1]);
+            giveAndTake[give][take]++; // 선물 횟수 증가
+            jisu[give]++;
+            jisu[take]--;
+        }
+
+        // 3. 조건에 따른 다음달 선물 개수 계산 처리
+        for (int x = 0; x < fLen; x++) {
+            for (int y = x + 1; y < fLen; y++) {
+                // 선물 비교
+                if (giveAndTake[x][y] > giveAndTake[y][x]) nextGift[x]++;
+                else if (giveAndTake[x][y] < giveAndTake[y][x]) nextGift[y]++;
+                else {
+                    if (jisu[x] > jisu[y]) nextGift[x]++;
+                    else if (jisu[x] < jisu[y]) nextGift[y]++;
+                }
+            }
+        }
+
+        // 4. 정답 도출
+        int answer = 0;
+        for (int i = 0; i < fLen; i++) {
+            answer = Math.max(answer, nextGift[i]);
+        }
+        
+        return answer;
+    }
+}
