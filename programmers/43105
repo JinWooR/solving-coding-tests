@@ -1,0 +1,30 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/43105
+
+/*
+  DP (Dynamic Programming) Top-Down 방식 구현
+
+  반복문 시작부에서 맨 상단 한칸 아래에서 시작.
+  연결된 상단 값 중 더 큰값을 비교 합산 처리.
+*/
+class Solution {
+    public int solution(int[][] triangle) {
+        int len = triangle.length;
+        int answer = 0;
+
+        // 반복문 시작
+        for (int i = 1; i < len; i++) {
+            for (int j = 0; j < i + 1; j++) {
+                int v1 = 0, v2 = 0;
+                if (0 < j) v1 = triangle[i-1][j-1];
+                if (j < i) v2 = triangle[i-1][j];
+                int result = triangle[i][j] + Math.max(v1, v2);
+                triangle[i][j] = result;
+                
+                answer = Math.max(answer, result);
+            }
+        }
+        
+        
+        return answer;
+    }
+}
