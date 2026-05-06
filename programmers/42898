@@ -1,0 +1,64 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/42898
+
+/*
+  상단과 좌측에 1칸씩 padding 영역을 추가하여 작업 진행함.
+*/
+class Solution {
+    public int solution(int m, int n, int[][] puddles) {
+        int[][] matrix = new int[m+1][n+1];
+        for (int i = puddles.length - 1; i >= 0; i--) {
+            matrix[puddles[i][0]][puddles[i][1]] = -1;
+        }
+        
+        matrix[1][1] = 1;
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if  (i == 1 && j == 1) continue;
+                
+                if (matrix[i][j] == -1) {
+                    matrix[i][j] = 0;
+                } else {
+                    matrix[i][j] = (matrix[i-1][j] + matrix[i][j-1]) % 1_000_000_007;
+                }
+            }
+        }
+        
+        return matrix[m][n];
+    }
+}
+
+/*
+    🚨 문제 파악 실수.
+     초기 BFS 최단 경로를 찾는 문제로 잘못 파악하였음.
+*/
+// import java.util.*;
+
+// class Solution {
+//     public int solution(int m, int n, int[][] puddles) {
+//         int[][] matrix = new int[m+1][n+1];
+//         int[] dx = new int[]{0,1};
+//         int[] dy = new int[]{1,0};
+        
+//         // 물 웅덩이 지정
+//         for (int i = puddles.length - 1; i > 0; i--) {
+//             matrix[puddles[i][0]][puddles[i][1]] = -1;
+//         }
+        
+//         // 경로 탐색
+//         Queue<Integer[]> q = new LinkedList();
+//         q.offer(new Integer[]{1,1});
+//         while (!q.isEmpty()) {
+//             Integer[] coord = q.poll();
+//             int dist = matrix[coord[0]][coord[1]];
+//             for (int i = 0; i < 2; i++) {
+//                 int nx = coord[0] + dx[i],
+//                     ny = coord[1] + dy[i];
+//                 if (nx > m || ny > n || matrix[nx][ny] != 0) continue;
+//                 matrix[nx][ny] = (dist + 1) % 1_000_000_007;
+//                 q.offer(new Integer[]{nx, ny});
+//             }
+//         }
+        
+//         return matrix[m][n] - 1;
+//     }
+// }
