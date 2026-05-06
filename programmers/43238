@@ -1,0 +1,29 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/43238
+
+/*
+  이분탐색 알고리즘
+    hi = (가장 느린 심사 시간) * (총 인원 수)
+*/
+class Solution {
+    public long solution(int n, int[] times) {
+        int len = times.length;
+        long hi = 0L, lo = 0L;
+        
+        for (int i = 0; i < len; i++) if (hi < times[i]) hi = times[i];
+        hi *= n;
+        
+        while (lo + 1 < hi) {
+            long mid = (hi + lo) / 2L;
+            long total = 0L;
+            
+            for (int i = 0; i < len; i++) {
+                total += mid / times[i];
+            }
+            
+            if (n <= total) hi = mid;
+            else lo = mid;
+        }
+        
+        return hi;
+    }
+}
