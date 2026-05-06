@@ -1,6 +1,23 @@
 // https://school.programmers.co.kr/learn/courses/30/lessons/43105
 
 /*
+  DP (Dynamic Programming) Bottom-Up 방식 구현
+
+  Top-Down 방식보다 소스가 간결하며 가독성이 뛰어나짐.
+*/
+class Solution { // DP (Bottom-Up) 방식 구현
+    public int solution(int[][] triangle) {
+        for (int i = triangle.length - 2; i >= 0; i--) {
+            for (int j = 0; j < i + 1; j++) {
+                triangle[i][j] += Math.max(triangle[i+1][j], triangle[i+1][j+1]);
+            }
+        }
+        
+        return triangle[0][0];
+    }
+}
+
+/*
   DP (Dynamic Programming) Top-Down 방식 구현
 
   반복문 시작부에서 맨 상단 한칸 아래에서 시작.
@@ -23,7 +40,6 @@ class Solution {
                 answer = Math.max(answer, result);
             }
         }
-        
         
         return answer;
     }
