@@ -1,0 +1,58 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/42892
+
+/*
+  노드 좌표별 정렬 우선 진행
+    - 정렬 조건: Y 좌표 내림차순 / X 좌표 오름차순
+
+  현재 노드로부터 우측 그룹 / 좌측 그룹 분류 및 재귀 호출
+    - 우측 그룹: 현재 노드의 X 좌표보다 작은 노드 그룹
+    - 좌측 그룹: 현재 노드의 X 좌표보다 큰 노드 그룹
+*/
+import java.util.*;
+
+class Solution {
+    int[][] answer; // 답변
+    int front = 0, back = 0;
+    
+    public int[][] solution(int[][] nodeinfo) {
+        int len = nodeinfo.length;
+        answer = new int[2][len];
+        
+        int[][] nodes = new int[len][3];
+        for (int i = 0; i < len; i++) {
+            nodes[i] = new int[]{nodeinfo[i][0], nodeinfo[i][1], i+1};
+        }
+        Arrays.sort(nodes, (o1, o2) -> (o1[1] == o2[1] ? o1[0] - o2[0] : o2[1] - o1[1]));
+        Queue<Integer[]> q = new LinkedList();
+        for (int[] node: nodes) {
+            q.offer(new Integer[]{node[0], node[1], node[2]});
+        }
+        
+        division(q);
+        
+        return answer;
+    }
+    
+    public void division(Queue<Integer[]> q) {
+        Integer[] node = q.poll();
+        int x = node[0];
+        answer[0][front] = node[2]; // 전위 순회 값 세
+        front++;
+        
+        Queue<Integer[]> right = new LinkedList();
+        Queue<Integer[]> left = new LinkedList();
+        while(!q.isEmpty()) {
+            Integer[] next = q.poll();
+            if (next[0] < x) {
+                left.offer(next);
+            } else {
+                right.offer(next);
+            }
+        }
+        if (!left.isEmpty()) division(left);
+        if (!right.isEmpty()) division(right);
+        
+        answer[1][back] = node[2]; // 후위 순회 값 세팅
+        back++;
+    }
+}
