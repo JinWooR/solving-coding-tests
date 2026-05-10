@@ -1,0 +1,68 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/49191
+
+/*
+  승자 / 패자 노드 그래프를 그린 뒤.
+  모든 노드들을 1번씩 bfs를 통해 각 상태별 인원 수 집계.
+*/
+import java.util.*;
+
+class Solution {
+    List<Integer>[] winNodes; // winNodes[승자 노드] = 해당 하위 노드들
+    List<Integer>[] loseNodes; // loseNodes[패자 노드] = 해당 상위 노드들
+    
+    public int solution(int n, int[][] results) {
+        winNodes = new ArrayList[n+1];
+        loseNodes = new ArrayList[n+1];
+        for (int i = 0; i < n; i++) {
+            winNodes[i+1] = new ArrayList();
+            loseNodes[i+1] = new ArrayList();
+        }
+        
+        // draw
+        for (int[] result: results) {
+            int win = result[0],
+                lose = result[1];
+            winNodes[win].add(lose);
+            loseNodes[lose].add(win);
+        }
+        
+        // bfs
+        int answer = 0;
+        Set<Integer> setVisit = new HashSet();
+        for (int i = 0; i < n; i++) {
+            setVisit.clear();
+            if (bfs(i + 1, setVisit) == n) answer++;
+        }
+        
+        return answer;
+    }
+    
+    public int bfs(int idx, Set<Integer> setVisit) {
+        Queue<Integer> q = new LinkedList();
+        setVisit.add(idx);
+        
+        q.offer(idx);
+        while (!q.isEmpty()) { // winPoll
+            int cur = q.poll();
+            for (Integer node: winNodes[cur]) {
+                if (!setVisit.contains(node)) {
+                    setVisit.add(node);
+                    q.offer(node);
+                }
+            }
+        }
+        
+        q.offer(idx);
+        while (!q.isEmpty()) { // losePoll
+            int cur = q.poll();
+            for (Integer node: loseNodes[cur]) {
+                if (!setVisit.contains(node)) {
+                    setVisit.add(node);
+                    q.offer(node);
+                }
+            }
+        }
+        
+        return setVisit.size();
+    }
+}
