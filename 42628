@@ -1,0 +1,22 @@
+// https://school.programmers.co.kr/learn/courses/30/lessons/42628
+
+import java.util.*;
+
+class Solution {
+    public int[] solution(String[] operations) {
+        SortedSet<Integer> sorted = new TreeSet<>();
+        
+        for (String operation: operations) {
+            String[] o = operation.split(" "); // 요청 분리
+            int num = Integer.parseInt(o[1]);
+
+            if ("D".equals(o[0]) && !sorted.isEmpty()) { // 제거
+                if (num == 1) sorted.remove(sorted.last());
+                else if (num == -1) sorted.remove(sorted.first());
+            }
+            else if ("I".equals(o[0]) && !sorted.contains(num)) sorted.add(num); // 삽입 (중복 삽입 방지)
+        }
+        
+        return sorted.size() >= 1 ? new int[] {sorted.last(), sorted.first()} : new int[2];
+    }
+}
